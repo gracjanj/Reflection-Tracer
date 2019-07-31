@@ -152,8 +152,8 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
     {
         switch (columnIndex)
         {
-        	case 0:
-        		return "ID";
+	    case 0:
+		return "ID";
             case 1:
                 return "Tool";
             case 2:
@@ -176,8 +176,8 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
 
         switch (columnIndex)
         {
-        	case 0:
-        		return rowIndex;
+            case 0:
+        	return rowIndex;
             case 1:
                 return callbacks.getToolName(logEntry.tool);
             case 2:
