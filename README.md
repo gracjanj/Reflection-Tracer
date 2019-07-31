@@ -15,3 +15,6 @@ Follower is a Burp extension that let's you generate unique values for your para
     - Request1 is the request that introduced value to the application
     - Request2 is the request that triggered the response containing value from step 1
     - Response is the response that contains reflected value
+
+# Changelog
+**1.0 Release**
