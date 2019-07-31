@@ -9,7 +9,7 @@ Follower is a Burp extension that let's you generate unique values for tested pa
 
 # Example usage
 1. Right click -> 'Generate Follower'. Unique value is now in your clipboard.
-2. Paste string as parameter value.
+2. Paste string as a parameter value.
 3. Crawl website manually/automatically.
 4. Results will be available in Follower tab
     - Request1 is the request that introduced value to the application
