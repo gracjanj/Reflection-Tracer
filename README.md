@@ -1,3 +1,17 @@
 # Follower
-Follower is a Burp extension that let's you generate unique values for your parameters and follow their reflections on your target application. This is particularly useful in finding XSS, SSTI and other vulnerabilities.
+Follower is a Burp extension that let's you generate unique values for your parameters and follow their reflections on your target application. This is particularly useful in finding XSS, SSTI and other vulnerabilities. It also adds unique value to each parameter tested during Active Scanning.
 
+# Installation
+- Download the Follower.jar file.
+- In Burp Suite open Extender tab. In Extensions tab, click Add button.
+- Choose downloaded jar file -> Next.
+- Check installation for no error messages.
+
+# Example usage
+1. Right click -> 'Generate Follower'. Unique value is now in your clipboard.
+2. Paste string as parameter value.
+3. Crawl website manually/automatically.
+4. Results will be available in Follower tab
+    - Request1 is the request that introduced value to the application
+    - Request2 is the request that triggered the response containing value from step 1
+    - Response is the response that contains reflected value
