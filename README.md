@@ -21,6 +21,6 @@ Follower is a Burp extension that let's you generate unique values for tested pa
 **1.0 Release**
 
 **1.1**
-- New column with Follower values
+- New columns with responses information
 - Duplicate responses are no longer displayed
 - General tweaks
