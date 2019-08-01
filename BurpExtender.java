@@ -288,7 +288,7 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
                 {
                     if(!requestsIds.findResponse(callbacks.saveBuffersToTempFiles(messageInfo)))
                     {
-                        Pattern pattern = Pattern.compile(f0lwr+"[a-z,0-9]{8}");
+                        Pattern pattern = Pattern.compile(f0lwr+"[a-z0-9]{8}");
                         Matcher matcher = pattern.matcher(response);
                         if(matcher.find())
                         {
