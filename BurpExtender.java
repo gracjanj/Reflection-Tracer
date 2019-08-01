@@ -147,7 +147,7 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
     @Override
     public int getColumnCount()
     {
-        return 4;
+        return 7;
     }
 
     @Override
@@ -163,6 +163,12 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
             return "Follower";
         case 3:
             return "URL";
+        case 4:
+            return "Code";
+        case 5:
+            return "Length";
+        case 6:
+            return "MIME";
         default:
             return "";
         }
@@ -189,6 +195,12 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
             return logEntry.follower;
         case 3:
             return logEntry.url.toString();
+        case 4:
+            return helpers.analyzeResponse(logEntry.requestResponseTwo.getResponse()).getStatusCode();
+        case 5:
+            return logEntry.requestResponseTwo.getResponse().length;
+        case 6:
+            return helpers.analyzeResponse(logEntry.requestResponseTwo.getResponse()).getStatedMimeType();
         default:
             return "";
         }
@@ -290,7 +302,7 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
                     {
                         Pattern pattern = Pattern.compile(f0lwr+"[a-z0-9]{8}");
                         Matcher matcher = pattern.matcher(response);
-                        if(matcher.find())
+                        while(matcher.find())
                         {
                             if(requestsIds.findUId(matcher.group()))
                             { 
