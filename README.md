@@ -14,7 +14,7 @@ Follower is a Burp extension that let's you generate unique values for tested pa
 4. Crawl website manually/automatically.
 5. Results will be available in the Follower tab
     - Request 1 is the request that introduced value to the application
-    - Request 2 is the request that triggered the response containing value from step 1
+    - Request 2 is the request that triggered the response containing reflected value
     - Response is the response that contains reflected value
 
 # Changelog
