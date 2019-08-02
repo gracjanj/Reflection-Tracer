@@ -302,19 +302,24 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
                     {
                         Pattern pattern = Pattern.compile(f0lwr+"[a-z0-9]{8}");
                         Matcher matcher = pattern.matcher(response);
+                        String lastOne = "";
                         while(matcher.find())
                         {
-                            if(requestsIds.findUId(matcher.group()))
-                            { 
-                                IHttpRequestResponse request = requestsIds.findRequest(matcher.group());
-                                requestsIds.addResponse(callbacks.saveBuffersToTempFiles(messageInfo));
-                                // Create a new log entry with the message details	        			
-                                synchronized(log)
-                                {
-                                    int row = log.size();
-                                    log.add(new LogEntry(toolFlag, callbacks.saveBuffersToTempFiles(request), 
-                                            helpers.analyzeRequest(messageInfo).getUrl(), callbacks.saveBuffersToTempFiles(messageInfo), matcher.group()));
-                                    fireTableRowsInserted(row, row);
+                            if(!matcher.group().equals(lastOne))
+                            {
+                                if(requestsIds.findUId(matcher.group()))
+                                {                               
+                                    lastOne = matcher.group();
+                                    IHttpRequestResponse request = requestsIds.findRequest(matcher.group());
+                                    requestsIds.addResponse(callbacks.saveBuffersToTempFiles(messageInfo));
+                                    // Create a new log entry with the message details	        			
+                                    synchronized(log)
+                                    {
+                                        int row = log.size();
+                                        log.add(new LogEntry(toolFlag, callbacks.saveBuffersToTempFiles(request), 
+                                                helpers.analyzeRequest(messageInfo).getUrl(), callbacks.saveBuffersToTempFiles(messageInfo), matcher.group()));
+                                        fireTableRowsInserted(row, row);
+                                    }
                                 }
                             }
                         }
