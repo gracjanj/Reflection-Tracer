@@ -257,37 +257,39 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
     //Process HTTP messages
     @Override
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
-        if(messageIsRequest) {
-            if (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl())) {
-                String request = helpers.bytesToString(messageInfo.getRequest());
-                if(request.indexOf(tr4c3) != -1) {
-                    requestsIds.addRequest(callbacks.saveBuffersToTempFiles(messageInfo));
-                }
-            }
-        }
-        
-        if((!messageIsRequest) && (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl()))) {
-            String response = helpers.bytesToString(messageInfo.getResponse());
-            if((response.indexOf(tr4c3) != -1) && (!requestsIds.findResponse(callbacks.saveBuffersToTempFiles(messageInfo)))) {
-                Pattern pattern = Pattern.compile(tr4c3+"[a-z0-9]{8}");
-                Matcher matcher = pattern.matcher(response);
-                String lastOne = "";
-                while(matcher.find()) {
-                    if((!matcher.group().equals(lastOne)) && (requestsIds.findUId(matcher.group()))) {
-                        lastOne = matcher.group();
-                        IHttpRequestResponse request = requestsIds.findRequest(matcher.group());
-                        requestsIds.addResponse(callbacks.saveBuffersToTempFiles(messageInfo));
-                        // Create a new log entry with the message details	        			
-                        synchronized(log) {
-                            int row = log.size();
-                            log.add(new LogEntry(toolFlag, callbacks.saveBuffersToTempFiles(request), 
-                                    helpers.analyzeRequest(messageInfo).getUrl(), callbacks.saveBuffersToTempFiles(messageInfo), matcher.group()));
-                            fireTableRowsInserted(row, row);
-                        }
+        if(messageInfo != null) {
+            if(messageIsRequest) {
+                if (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl())) {
+                    String request = helpers.bytesToString(messageInfo.getRequest());
+                    if(request.indexOf(tr4c3) != -1) {
+                        requestsIds.addRequest(callbacks.saveBuffersToTempFiles(messageInfo));
                     }
                 }
             }
-        }	
+            
+            if((!messageIsRequest) && (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl()))) {
+                String response = helpers.bytesToString(messageInfo.getResponse());
+                if((response.indexOf(tr4c3) != -1) && (!requestsIds.findResponse(callbacks.saveBuffersToTempFiles(messageInfo)))) {
+                    Pattern pattern = Pattern.compile(tr4c3+"[a-z0-9]{8}");
+                    Matcher matcher = pattern.matcher(response);
+                    String lastOne = "";
+                    while(matcher.find()) {
+                        if((!matcher.group().equals(lastOne)) && (requestsIds.findUId(matcher.group()))) {
+                            lastOne = matcher.group();
+                            IHttpRequestResponse request = requestsIds.findRequest(matcher.group());
+                            requestsIds.addResponse(callbacks.saveBuffersToTempFiles(messageInfo));
+                            // Create a new log entry with the message details	        			
+                            synchronized(log) {
+                                int row = log.size();
+                                log.add(new LogEntry(toolFlag, callbacks.saveBuffersToTempFiles(request), 
+                                        helpers.analyzeRequest(messageInfo).getUrl(), callbacks.saveBuffersToTempFiles(messageInfo), matcher.group()));
+                                fireTableRowsInserted(row, row);
+                            }
+                        }
+                    }
+                }
+            }	
+        }
     }
 
     //Scanner methods
