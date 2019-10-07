@@ -35,25 +35,23 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
     private IMessageEditor requestOneViewer;
     private IMessageEditor requestTwoViewer;
     private IMessageEditor responseViewer;
-    private ARequestsIds requestsIds = new ARequestsIds();  
     private IHttpRequestResponse currentlyDisplayedItem;
     private static IExtensionHelpers helpers;
     private final List<LogEntry> log = new ArrayList<LogEntry>();
-    private final String f0lwr = "f0lwr";
-
+    private ARequestsIds requestsIds = new ARequestsIds();  
+    private final String tr4c3 = "tr4c3";
 
     //
     // implement IBurpExtender
     //
 
     @Override
-    public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks)
-    {
+    public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         // Keep a reference to our callbacks object
         this.callbacks = callbacks;
 
         // Set our extension name
-        callbacks.setExtensionName("Follower");
+        callbacks.setExtensionName("Reflection Tracer");
 
         // register ourselves as an HTTP listener
         callbacks.registerHttpListener(this); 
@@ -67,11 +65,9 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
         // get Helpers
         helpers = callbacks.getHelpers();
 
-        SwingUtilities.invokeLater(new Runnable() 
-        {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 // main split pane
                 splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
@@ -109,50 +105,42 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
     }
 
     @Override
-    public String getTabCaption()
-    {
-        return "Follower";
+    public String getTabCaption() {
+        return "Tracer";
     }
 
     @Override
-    public Component getUiComponent()
-    {
+    public Component getUiComponent() {
         return splitPane;
     }
 
     @Override
-    public byte[] getRequest()
-    {
+    public byte[] getRequest() {
         return currentlyDisplayedItem.getRequest();
     }
 
     @Override
-    public IHttpService getHttpService()
-    {
+    public IHttpService getHttpService() {
         return currentlyDisplayedItem.getHttpService();
     }
 
     @Override
-    public byte[] getResponse()
-    {
+    public byte[] getResponse() {
         return currentlyDisplayedItem.getResponse();
     }
 
     @Override
-    public int getRowCount()
-    {
+    public int getRowCount() {
         return log.size();
     }
 
     @Override
-    public int getColumnCount()
-    {
+    public int getColumnCount() {
         return 7;
     }
 
     @Override
-    public String getColumnName(int columnIndex)
-    {
+    public String getColumnName(int columnIndex) {
         switch (columnIndex)
         {
         case 0:
@@ -160,7 +148,7 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
         case 1:
             return "Tool";
         case 2:
-            return "Follower";
+            return "Tracer";
         case 3:
             return "URL";
         case 4:
@@ -175,24 +163,21 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
     }
 
     @Override
-    public Class<?> getColumnClass(int columnIndex)
-    {
+    public Class<?> getColumnClass(int columnIndex) {
         return String.class;
     }
 
     @Override
-    public Object getValueAt(int rowIndex, int columnIndex)
-    {
+    public Object getValueAt(int rowIndex, int columnIndex) {
         LogEntry logEntry = log.get(rowIndex);
 
-        switch (columnIndex)
-        {
+        switch (columnIndex) {
         case 0:
             return rowIndex;
         case 1:
             return callbacks.getToolName(logEntry.tool);
         case 2:
-            return logEntry.follower;
+            return logEntry.tracer;
         case 3:
             return logEntry.url.toString();
         case 4:
@@ -207,41 +192,35 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
     }
 
     //Extension tab table class
-    private class Table extends JTable
-    {
-        public Table(TableModel tableModel)
-        {
+    private class Table extends JTable {
+        public Table(TableModel tableModel) {
             super(tableModel);
         }
 
         @Override
-        public void changeSelection(int row, int col, boolean toggle, boolean extend)
-        {
+        public void changeSelection(int row, int col, boolean toggle, boolean extend) {
             // show the log entry for the selected row
             LogEntry logEntry = log.get(row);
             requestOneViewer.setMessage(logEntry.requestResponseOne.getRequest(), true);
             requestTwoViewer.setMessage(logEntry.requestResponseTwo.getRequest(), true);
             responseViewer.setMessage(logEntry.requestResponseTwo.getResponse(), false);
             currentlyDisplayedItem = logEntry.requestResponseOne;
-
             super.changeSelection(row, col, toggle, extend);
         }        
     }
 
     //Create menu element
     @Override
-    public List<JMenuItem> createMenuItems(IContextMenuInvocation invocation)
-    {
+    public List<JMenuItem> createMenuItems(IContextMenuInvocation invocation) {
         List<JMenuItem> menuOptions = new ArrayList<>();
-        JMenuItem item = new JMenuItem("Generate Follower");
+        JMenuItem item = new JMenuItem("Generate Tracer");
         item.addActionListener(new OrderListener());
         menuOptions.add(item);
         return menuOptions;
     }
 
     //Listener to menu
-    class OrderListener implements ActionListener, ClipboardOwner
-    {
+    class OrderListener implements ActionListener, ClipboardOwner {
         public void actionPerformed(ActionEvent e)
         {
             Utils util = new Utils();
@@ -257,82 +236,63 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
     }
 
 
-
     //Log entries for extension tab
-    private static class LogEntry
-    {
+    private static class LogEntry {
         final int tool;
-        final String follower;
+        final String tracer;
         final IHttpRequestResponse requestResponseOne;
         final IHttpRequestResponse requestResponseTwo;
         final URL url;
 
-        LogEntry(int tool, IHttpRequestResponse requestResponseOne, URL url, IHttpRequestResponse requestResponseTwo, String follower)
-        {
+        LogEntry(int tool, IHttpRequestResponse requestResponseOne, URL url, IHttpRequestResponse requestResponseTwo, String tracer) {
             this.tool = tool;
             this.requestResponseOne = requestResponseOne;
             this.requestResponseTwo = requestResponseTwo;
             this.url = url;
-            this.follower = follower;
+            this.tracer = tracer;
         }
     }
 
 
     //Process HTTP messages
     @Override
-    public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo)
-    {
+    public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
         if(messageIsRequest) {
-            if (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl()))
-            {
+            if (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl())) {
                 String request = helpers.bytesToString(messageInfo.getRequest());
-                if(request.indexOf(f0lwr) != -1) {
+                if(request.indexOf(tr4c3) != -1) {
                     requestsIds.addRequest(callbacks.saveBuffersToTempFiles(messageInfo));
                 }
             }
         }
-        if(!messageIsRequest)
-        {
-            if (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl()))
-            {
-                String response = helpers.bytesToString(messageInfo.getResponse());
-                if(response.indexOf(f0lwr) != -1)
-                {
-                    if(!requestsIds.findResponse(callbacks.saveBuffersToTempFiles(messageInfo)))
-                    {
-                        Pattern pattern = Pattern.compile(f0lwr+"[a-z0-9]{8}");
-                        Matcher matcher = pattern.matcher(response);
-                        String lastOne = "";
-                        while(matcher.find())
-                        {
-                            if(!matcher.group().equals(lastOne))
-                            {
-                                if(requestsIds.findUId(matcher.group()))
-                                {                               
-                                    lastOne = matcher.group();
-                                    IHttpRequestResponse request = requestsIds.findRequest(matcher.group());
-                                    requestsIds.addResponse(callbacks.saveBuffersToTempFiles(messageInfo));
-                                    // Create a new log entry with the message details	        			
-                                    synchronized(log)
-                                    {
-                                        int row = log.size();
-                                        log.add(new LogEntry(toolFlag, callbacks.saveBuffersToTempFiles(request), 
-                                                helpers.analyzeRequest(messageInfo).getUrl(), callbacks.saveBuffersToTempFiles(messageInfo), matcher.group()));
-                                        fireTableRowsInserted(row, row);
-                                    }
-                                }
-                            }
+        
+        if((!messageIsRequest) && (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl()))) {
+            String response = helpers.bytesToString(messageInfo.getResponse());
+            if((response.indexOf(tr4c3) != -1) && (!requestsIds.findResponse(callbacks.saveBuffersToTempFiles(messageInfo)))) {
+                Pattern pattern = Pattern.compile(tr4c3+"[a-z0-9]{8}");
+                Matcher matcher = pattern.matcher(response);
+                String lastOne = "";
+                while(matcher.find()) {
+                    if((!matcher.group().equals(lastOne)) && (requestsIds.findUId(matcher.group()))) {
+                        lastOne = matcher.group();
+                        IHttpRequestResponse request = requestsIds.findRequest(matcher.group());
+                        requestsIds.addResponse(callbacks.saveBuffersToTempFiles(messageInfo));
+                        // Create a new log entry with the message details	        			
+                        synchronized(log) {
+                            int row = log.size();
+                            log.add(new LogEntry(toolFlag, callbacks.saveBuffersToTempFiles(request), 
+                                    helpers.analyzeRequest(messageInfo).getUrl(), callbacks.saveBuffersToTempFiles(messageInfo), matcher.group()));
+                            fireTableRowsInserted(row, row);
                         }
                     }
                 }
-            }	
-        }
+            }
+        }	
     }
 
     //Scanner methods
     @Override
-    public List<IScanIssue> doActiveScan(IHttpRequestResponse baseRequestResponse, IScannerInsertionPoint insertionPoint)
-    {
+    public List<IScanIssue> doActiveScan(IHttpRequestResponse baseRequestResponse, IScannerInsertionPoint insertionPoint) {
         Utils utils = new Utils();
         String uId = utils.generateUid();
         //ARequestsIds requestsIds = new ARequestsIds();
@@ -343,21 +303,17 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
     }
 
     @Override
-    public List<IScanIssue> doPassiveScan(IHttpRequestResponse baseRequestResponse)
-    {
+    public List<IScanIssue> doPassiveScan(IHttpRequestResponse baseRequestResponse) {
         return null;
     }
 
     @Override
-    public int consolidateDuplicateIssues(IScanIssue existingIssue, IScanIssue newIssue)
-    {
+    public int consolidateDuplicateIssues(IScanIssue existingIssue, IScanIssue newIssue) {
         return 0;
     }
 
-
-    //Class with Requests Responses and generated Followers
-    static class ARequestsIds
-    {
+    //Class with Requests Responses and generated Tracers
+    static class ARequestsIds {
         static List<String> uIds = new ArrayList<String>();
         static List<IHttpRequestResponsePersisted> requests = new ArrayList<IHttpRequestResponsePersisted>();
         static List<String> responses = new ArrayList<String>();
@@ -375,40 +331,31 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
             responses.add(helpers.bytesToString(messageInfo.getResponse()));
         }
 
-        public Boolean findUId(String uId)
-        {
-            if(uIds.contains(uId))
-            {
+        public Boolean findUId(String uId) {
+            if(uIds.contains(uId)) {
                 return true;
-            } else
-            {
+            } else {
                 return false;
             }
         }
 
-        public IHttpRequestResponsePersisted findRequest(String uId)
-        {
-            for (int i=0; i < requests.size(); i++)
-            {
+        public IHttpRequestResponsePersisted findRequest(String uId) {
+            for (int i=0; i < requests.size(); i++) {
                 String request = helpers.bytesToString(requests.get(i).getRequest());
-                if(request.indexOf(uId) != -1)
-                {
+                if(request.indexOf(uId) != -1) {
                     return requests.get(i);
                 } 
             } return null;
         }
 
         public boolean findResponse(IHttpRequestResponsePersisted response) {
-            if(responses.contains(helpers.bytesToString(response.getResponse())))
-            {
+            if(responses.contains(helpers.bytesToString(response.getResponse()))) {
                 return true;
-            } else
-            {
+            } else {
                 return false;
             }
         }
     }
-
 
     //Utils
     class Utils {
@@ -423,10 +370,9 @@ IContextMenuFactory, ITab, IMessageEditorController, IScannerCheck
                 while (hashtext.length() < 32) { 
                     hashtext = "0" + hashtext; 
                 } 
-                String uId = f0lwr + hashtext.substring(0, 8);
+                String uId = tr4c3 + hashtext.substring(0, 8);
                 return uId;
-            } catch (NoSuchAlgorithmException e)
-            {
+            } catch (NoSuchAlgorithmException e) {
                 return "An error occured while generating UID";
             }         
         }
